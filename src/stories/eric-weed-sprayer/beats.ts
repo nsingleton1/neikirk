@@ -85,6 +85,8 @@ export interface VisitOpts {
   /** ms both parties spend arguing. */
   argueMs: number;
   bubbles?: string;
+  /** Cartoon warning shots fired mid-argument (Eric hits the deck each time). */
+  shots?: number;
 }
 
 /**
@@ -147,6 +149,33 @@ export function vehicleConfrontation(o: VisitOpts): TimelineAction[] {
     { type: "moveTo", actorId: o.driverId, to: o.confrontAt, speed: 3.5 },
     { type: "face", actorId: o.driverId, dir: "up" },
     ...argue,
+    ...(o.shots
+      ? Array.from({ length: o.shots }, (): TimelineAction[] => [
+          {
+            type: "parallel",
+            tracks: [
+              [
+                { type: "anim", actorId: o.driverId, name: "shoot", durationMs: 800 },
+                { type: "speechBubble", actorId: o.driverId, symbols: "BANG!", durationMs: 700 },
+              ],
+              [
+                { type: "wait", ms: 250 },
+                // Eric hits the deck (the nap frames double as a dive)
+                { type: "anim", actorId: ERIC, name: "nap", durationMs: 900 },
+              ],
+            ],
+          },
+          { type: "wait", ms: 200 },
+        ]).flat()
+      : []),
+    ...(o.shots
+      ? [
+          // both pop back up for one last round of fist-shaking
+          { type: "anim", actorId: ERIC, name: "argue" } as TimelineAction,
+          { type: "shake", actorId: ERIC, durationMs: 800 } as TimelineAction,
+          { type: "stopAnim", actorId: ERIC } as TimelineAction,
+        ]
+      : []),
     // driver stomps back, vehicle leaves
     { type: "moveTo", actorId: o.driverId, to: { x: o.parkX, y: SIDEWALK_Y }, speed: 3.5 },
     { type: "despawn", actorId: o.driverId },
@@ -154,6 +183,27 @@ export function vehicleConfrontation(o: VisitOpts): TimelineAction[] {
     { type: "moveTo", actorId: o.vehicleId, to: { x: 12, y: ROAD_Y }, speed: 8 },
     { type: "despawn", actorId: o.vehicleId },
   ];
+}
+
+/**
+ * Sneakily plant weeds: shifty look both ways, then hunch down and tuck a
+ * fresh weed into each tile. Job security.
+ */
+export function plantWeeds(tiles: Vec[]): TimelineAction[] {
+  const actions: TimelineAction[] = [
+    { type: "face", actorId: ERIC, dir: "left" },
+    { type: "wait", ms: 350 },
+    { type: "face", actorId: ERIC, dir: "right" },
+    { type: "wait", ms: 350 },
+  ];
+  for (const tile of tiles) {
+    actions.push(
+      { type: "moveTo", actorId: ERIC, to: tile, speed: 2.8 },
+      { type: "anim", actorId: ERIC, name: "plant", durationMs: 1600 },
+      { type: "setTile", tile, state: "weedy" },
+    );
+  }
+  return actions;
 }
 
 /** Instantly mark a rectangular block of lawn as sprayed (post-timeskip). */

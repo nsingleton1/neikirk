@@ -4,7 +4,7 @@
  * same dimensions and frame layout. Only edit this file if the layout differs.
  *
  * Character sheets: 8 columns of 16x24 frames, poses in this order:
- *   0-1 idle | 2-3 walk | 4-5 spray | 6-7 phone | 8-9 sit | 10-11 nap | 12-13 argue | 14-15 pee
+ *   0-1 idle | 2-3 walk | 4-5 spray | 6-7 phone | 8-9 sit | 10-11 nap | 12-13 argue | 14-15 pee | 16-17 plant | 18-19 shoot
  * Vehicle sheets: 2 frames of 40x24 (drive bounce), side profile facing right.
  */
 import { SpriteSheetDef } from "../../engine/types";
@@ -23,6 +23,7 @@ export const urls = {
   vanSheet: `${BASE}/vehicles/van-red.png`,
   yardMap: `${BASE}/maps/yard.png`,
   tileSprayed: `${BASE}/maps/tile-sprayed.png`,
+  tileWeeds: `${BASE}/maps/tile-weeds.png`,
   doorBg: `${BASE}/ui/door-bg.png`,
 };
 
@@ -40,6 +41,8 @@ export function personSheet(url: string): SpriteSheetDef {
       nap: { frames: [10, 11], fps: 1.2 },
       argue: { frames: [12, 13], fps: 6 },
       pee: { frames: [14, 15], fps: 3 },
+      plant: { frames: [16, 17], fps: 2.5 },
+      shoot: { frames: [18, 19], fps: 6 },
     },
   };
 }

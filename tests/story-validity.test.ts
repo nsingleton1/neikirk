@@ -6,6 +6,7 @@
 import { describe, expect, it } from "vitest";
 import { TimelineRunner, tileKey } from "../src/engine/TimelineRunner";
 import { Scene } from "../src/engine/types";
+import { WEED_TILES } from "../src/stories/eric-weed-sprayer/scenes";
 import { ericWeedSprayerStory as story } from "../src/stories/eric-weed-sprayer/story";
 
 function collectActorIds(scene: Scene): string[] {
@@ -92,14 +93,22 @@ describe("story validity", () => {
     }
 
     expect(story.scenes[sceneId].type, `path: ${visited.join(" -> ")}`).toBe("ending");
+    // Ceiling is the ZERO-TAP worst case (every countdown runs out). A real
+    // player tapping through dialogue lands well under two minutes. Raised
+    // from 120s on 2026-07-18 when Nick added the planting + shooting gags
+    // and the fourth notice interrupt.
     expect(total, `total runtime ${Math.round(total / 1000)}s`).toBeGreaterThanOrEqual(60000);
-    expect(total, `total runtime ${Math.round(total / 1000)}s`).toBeLessThanOrEqual(120000);
+    expect(total, `total runtime ${Math.round(total / 1000)}s`).toBeLessThanOrEqual(140000);
 
-    // The final chunk leaves every lawn tile sprayed and the road empty.
+    // The final chunk leaves every lawn tile sprayed — except Eric's
+    // sneakily planted weeds, which survive — and the road empty.
     const world = lastRunner!.world;
+    const weedKeys = new Set(WEED_TILES.map(tileKey));
     for (let y = 4; y <= 12; y++)
-      for (let x = 0; x < story.maps.yard.cols; x++)
-        expect(world.tiles.get(tileKey({ x, y }))).toBe("sprayed");
+      for (let x = 0; x < story.maps.yard.cols; x++) {
+        const key = tileKey({ x, y });
+        expect(world.tiles.get(key)).toBe(weedKeys.has(key) ? "weedy" : "sprayed");
+      }
     expect(world.actors.has("van")).toBe(false);
     expect(world.actors.has("truck")).toBe(false);
   });

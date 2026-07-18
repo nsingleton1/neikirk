@@ -4,6 +4,7 @@ import {
   ERIC,
   nap,
   phoneCheck,
+  plantWeeds,
   sprayAll,
   sprayTile,
   vehicleConfrontation,
@@ -25,8 +26,18 @@ const CHUNK1_TILES: Vec[] = [
 const CHUNK2_TILES: Vec[] = [...CHUNK1_TILES, { x: 6, y: 5 }];
 const CHUNK3_TILES: Vec[] = [...CHUNK2_TILES, { x: 3, y: 8 }];
 
+/** Tiles where Eric sneakily plants NEW weeds. They survive the final
+ * time-skip spray — job security. */
+export const WEED_TILES: Vec[] = [
+  { x: 5, y: 7 },
+  { x: 6, y: 7 },
+];
+
 const carry = (tiles: Vec[]): TimelineAction[] =>
   tiles.map((tile) => ({ type: "setTile", tile, state: "sprayed" }));
+
+const carryWeeds = (): TimelineAction[] =>
+  WEED_TILES.map((tile) => ({ type: "setTile", tile, state: "weedy" }));
 
 /** Chunk 1: gets to work, first naps, van drive-by #1, then... the tree. */
 const yard1: TimelineAction[] = [
@@ -34,7 +45,7 @@ const yard1: TimelineAction[] = [
   { type: "showDialogue", speakerId: ERIC, text: "Alright. Time to get to work.", durationMs: 1800 },
   { type: "checkpoint", id: "work-started" },
   ...sprayTile({ x: 2, y: 5 }),
-  ...phoneCheck(1300),
+  ...phoneCheck(1800),
   ...sprayTile({ x: 4, y: 6 }),
   ...nap(1700),
   { type: "checkpoint", id: "van-1" },
@@ -58,7 +69,7 @@ const yard2: TimelineAction[] = [
   { type: "spawn", actorId: ERIC, at: { x: 7, y: 6 }, facing: "left" },
   { type: "checkpoint", id: "chunk-2" },
   ...sprayTile({ x: 6, y: 5 }),
-  ...phoneCheck(2000, "..."),
+  ...phoneCheck(2600, "..."),
   ...nap(1700),
   { type: "moveTo", actorId: ERIC, to: { x: 8.6, y: 12 }, speed: 2.8 },
   { type: "face", actorId: ERIC, dir: "down" },
@@ -66,18 +77,31 @@ const yard2: TimelineAction[] = [
   { type: "anim", actorId: ERIC, name: "phone" },
 ];
 
+/** Chunk 2b: serious phone time at the mailbox, then the sneaky planting. */
+const yard2b: TimelineAction[] = [
+  ...carry(CHUNK2_TILES),
+  { type: "spawn", actorId: ERIC, at: { x: 8.6, y: 12 }, facing: "down" },
+  { type: "checkpoint", id: "planting" },
+  ...phoneCheck(2600, "..."),
+  { type: "moveTo", actorId: ERIC, to: { x: 5.5, y: 8 }, speed: 2.8 },
+  ...plantWeeds(WEED_TILES),
+  { type: "anim", actorId: ERIC, name: "plant" },
+];
+
 /** Chunk 3: the big yellow-truck argument, a spray, straight into a nap. */
 const yard3: TimelineAction[] = [
   ...carry(CHUNK2_TILES),
-  { type: "spawn", actorId: ERIC, at: { x: 8.6, y: 12 }, facing: "down" },
+  ...carryWeeds(),
+  { type: "spawn", actorId: ERIC, at: { x: 6, y: 7 }, facing: "down" },
   { type: "checkpoint", id: "truck" },
   ...vehicleConfrontation({
     vehicleId: "truck",
     driverId: "schmidt",
-    parkX: 7,
-    confrontAt: { x: 7.6, y: 12 },
-    argueMs: 3200,
+    parkX: 6,
+    confrontAt: { x: 6, y: 8.6 },
+    argueMs: 2400,
     bubbles: "#?!*",
+    shots: 2,
   }),
   { type: "showDialogue", speakerId: ERIC, text: "Some people, huh.", durationMs: 1200 },
   ...sprayTile({ x: 3, y: 8 }),
@@ -88,6 +112,7 @@ const yard3: TimelineAction[] = [
 /** Chunk 4: van #2, one last tile, the deep nap, and the time skip. */
 const yard4: TimelineAction[] = [
   ...carry(CHUNK3_TILES),
+  ...carryWeeds(),
   { type: "spawn", actorId: ERIC, at: { x: 3, y: 8 }, facing: "down" },
   { type: "checkpoint", id: "van-2" },
   ...vehicleConfrontation({
@@ -104,6 +129,7 @@ const yard4: TimelineAction[] = [
   { type: "showDialogue", speakerId: ERIC, text: "Whew. Hard day's work.", durationMs: 1600 },
   { type: "timeSkip", label: "6 HOURS LATER...", durationMs: 1800 },
   ...sprayAll(0, 4, 9, 12),
+  ...carryWeeds(), // his planted weeds survive the "finished" lawn
   { type: "moveTo", actorId: ERIC, to: { x: 4.5, y: 12 }, speed: 3 },
   { type: "face", actorId: ERIC, dir: "down" },
   { type: "showDialogue", speakerId: ERIC, text: "All done. I'll send you the bill.", durationMs: 2000 },
@@ -116,12 +142,12 @@ function notice(id: string, text: string, excuseSceneId: string, nextChunkId: st
     id,
     type: "dialogue",
     speakerId: "you",
-    lines: [text, "Should you say something?"],
+    lines: [`${text} Should you say something?`],
     choices: [
       { id: "yes", label: "SAY SOMETHING", nextSceneId: excuseSceneId, isDefault: true },
       { id: "no", label: "LET IT SLIDE", nextSceneId: nextChunkId },
     ],
-    autoChooseAfterMs: 4000,
+    autoChooseAfterMs: 3400,
   };
 }
 
@@ -140,7 +166,7 @@ function excuse(
     backgroundUrl: urls.doorBg,
     lines,
     choices: [{ id: "ok", label: "...OKAY?", nextSceneId: nextChunkId, isDefault: true }],
-    autoChooseAfterMs: 4000,
+    autoChooseAfterMs: 3400,
   };
 }
 
@@ -196,12 +222,26 @@ export const scenes: Record<string, Scene> = {
     "notice-mail",
     "You notice Eric going through your mail.",
     "excuse-mail",
-    "yard-3",
+    "yard-2b",
   ),
   "excuse-mail": excuse(
     "excuse-mail",
     "annoyed",
     ["Relax. I'm checking for coupons.", "For YOU. Weed control is a team effort."],
+    "yard-2b",
+  ),
+
+  "yard-2b": scripted("yard-2b", yard2b, "notice-plant"),
+  "notice-plant": notice(
+    "notice-plant",
+    "You notice Eric planting NEW weeds in your lawn.",
+    "excuse-plant",
+    "yard-3",
+  ),
+  "excuse-plant": excuse(
+    "excuse-plant",
+    "default",
+    ["Those are decoy weeds. They lure out the real weeds.", "This is advanced lawn science. Trust the process."],
     "yard-3",
   ),
 

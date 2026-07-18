@@ -163,7 +163,14 @@ type Pose =
   | "argue0"
   | "argue1"
   | "pee0"
-  | "pee1";
+  | "pee1"
+  | "plant0"
+  | "plant1"
+  | "shoot0"
+  | "shoot1";
+
+const GUN_METAL = C("#3a3a42");
+const MUZZLE = C("#ffe066");
 
 const PEE_BLUE = C("#7ec8e8");
 
@@ -307,6 +314,34 @@ function drawChar(img: Img, ox: number, oy: number, s: CharStyle, pose: Pose) {
       if (pose === "pee1") img.px(bx + bodyW + 6, armY + 10, PEE_BLUE);
       break;
     }
+    case "plant0":
+    case "plant1": {
+      // hunched over, hand to the ground, sneaking a weed in
+      img.rect(bx - 1, armY, 1, 4, s.jacket);
+      img.rect(bx + bodyW, armY + 2, 2, 4, s.jacket); // arm reaching down
+      img.rect(bx + bodyW + 1, armY + 6, 2, 4, SKIN);
+      if (pose === "plant1") {
+        // the freshly planted weed appears at his hand
+        img.px(bx + bodyW + 2, oy + FH - 3, WEED);
+        img.px(bx + bodyW + 1, oy + FH - 2, WEED);
+        img.px(bx + bodyW + 3, oy + FH - 2, WEED);
+        img.px(bx + bodyW + 2, oy + FH - 4, WEED_FLOWER);
+      }
+      break;
+    }
+    case "shoot0":
+    case "shoot1": {
+      // arm extended with a cartoon shotgun; frame 1 adds the muzzle flash
+      img.rect(bx + bodyW, armY + 1, 3, 2, s.jacket);
+      img.rect(bx + bodyW + 3, armY + 1, 4, 1, GUN_METAL);
+      img.px(bx + bodyW + 3, armY + 2, GUN_METAL);
+      if (pose === "shoot1") {
+        img.px(bx + bodyW + 7, armY, MUZZLE);
+        img.px(bx + bodyW + 8, armY + 1, WHITE);
+        img.px(bx + bodyW + 7, armY + 2, MUZZLE);
+      }
+      break;
+    }
     default: {
       // arms at sides
       img.rect(bx - 1, armY, 1, 5, s.jacket);
@@ -332,6 +367,10 @@ const POSES: Pose[] = [
   "argue1",
   "pee0",
   "pee1",
+  "plant0",
+  "plant1",
+  "shoot0",
+  "shoot1",
 ];
 
 function makeCharSheet(file: string, style: CharStyle) {
@@ -482,6 +521,26 @@ function makeYardMap() {
   for (let x = 4; x < cols * ts; x += 16) img.rect(x, 15 * ts - 1, 8, 2, ROAD_LINE);
 
   img.save("maps/yard.png");
+}
+
+function makeWeedyOverlay() {
+  // Freshly PLANTED weeds — denser and healthier than the natural tufts.
+  const img = new Img(16, 16);
+  for (const [cx, cy] of [
+    [4, 5],
+    [11, 4],
+    [7, 10],
+    [12, 12],
+    [3, 12],
+  ] as const) {
+    img.px(cx, cy, WEED);
+    img.px(cx - 1, cy + 1, WEED);
+    img.px(cx + 1, cy + 1, WEED);
+    img.px(cx - 1, cy - 1, WEED);
+    img.px(cx + 1, cy - 1, WEED);
+    img.px(cx, cy - 2, WEED_FLOWER);
+  }
+  img.save("maps/tile-weeds.png");
 }
 
 function makeSprayedOverlay() {
@@ -644,6 +703,7 @@ makeVehicleSheet("vehicles/truck-yellow.png", drawTruck);
 makeVehicleSheet("vehicles/van-red.png", drawVan);
 makeYardMap();
 makeSprayedOverlay();
+makeWeedyOverlay();
 for (const e of ["smirk", "annoyed", "tired", "phone"] as Expression[]) makePortrait(e);
 makeDoorBackground();
 console.log("done");

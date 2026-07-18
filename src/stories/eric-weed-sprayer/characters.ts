@@ -46,6 +46,7 @@ export const maps: Record<string, MapDef> = {
     backgroundUrl: urls.yardMap,
     tileOverlays: {
       sprayed: urls.tileSprayed,
+      weedy: urls.tileWeeds,
     },
   },
 };
