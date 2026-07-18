@@ -101,6 +101,7 @@ const yard3: TimelineAction[] = [
   { type: "showDialogue", speakerId: ERIC, text: "Some people, huh.", durationMs: 1200 },
   ...sprayTile({ x: 3, y: 8 }),
   ...nap(1800),
+  { type: "emote", actorId: ERIC, emote: "ZZZ", durationMs: 2000 },
   { type: "anim", actorId: ERIC, name: "nap" },
 ];
 
@@ -207,7 +208,11 @@ export const scenes: Record<string, Scene> = {
   ),
   "excuse-pee": excuse(
     "excuse-pee",
-    ["EXCUSE ME?! That is a nitrogen-rich PRE-TREATMENT!", "I cannot BELIEVE you would even ask me that!"],
+    [
+      "Peeing? On a TREE? Do you HEAR yourself right now?",
+      "I was doing a soil moisture inspection. There isn't even a tree over there.",
+      "Honestly, I'm a little worried about you.",
+    ],
     "yard-2",
   ),
 
@@ -220,7 +225,11 @@ export const scenes: Record<string, Scene> = {
   ),
   "excuse-plant": excuse(
     "excuse-plant",
-    ["THOSE ARE DECOY WEEDS!! They lure out the REAL weeds!", "This is ADVANCED LAWN SCIENCE and you are RUINING it!"],
+    [
+      "PLANTING weeds?! I REMOVE weeds. It is LITERALLY my job.",
+      "Those weeds were always there. You just never noticed your own lawn.",
+      "You always do this. NOBODY else sees these 'new weeds.'",
+    ],
     "yard-3",
   ),
 
@@ -233,7 +242,11 @@ export const scenes: Record<string, Scene> = {
   ),
   "excuse-nap": excuse(
     "excuse-nap",
-    ["I was NOT SLEEPING! I was LISTENING to the LAWN!", "The AUDACITY. The weeds FEAR a rested man!!"],
+    [
+      "NAPPING?! I have been spraying NONSTOP since I got here.",
+      "You saw the z's? There were no z's. Nobody saw any z's.",
+      "Frankly it's weird how long you've been watching me.",
+    ],
     "yard-4",
   ),
 

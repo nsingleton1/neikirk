@@ -53,20 +53,21 @@ export function sitAndScroll(ms: number, emote: string): TimelineAction[] {
 }
 
 export function nap(ms: number, deep = false): TimelineAction[] {
-  const zTrack: TimelineAction[] = [{ type: "wait", ms: 400 }];
-  let t = 400;
+  // Every sleep gets z's: first one almost immediately, then a steady cycle.
+  const zTrack: TimelineAction[] = [{ type: "wait", ms: 250 }];
+  let t = 250;
   let n = 0;
-  while (t + 1300 < ms) {
+  do {
     zTrack.push({
       type: "emote",
       actorId: ERIC,
       emote: deep ? "ZZZ" : n % 2 === 0 ? "z" : "Zz",
-      durationMs: 1200,
+      durationMs: Math.min(1000, ms - t),
     });
-    zTrack.push({ type: "wait", ms: 1300 });
-    t += 1300;
+    zTrack.push({ type: "wait", ms: 1100 });
+    t += 1100;
     n++;
-  }
+  } while (t < ms - 200);
   return [
     {
       type: "parallel",
