@@ -3,7 +3,7 @@ import { personSheet, urls, vehicleSheet } from "./assets";
 
 export const characters: Record<string, CharacterDef> = {
   eric: {
-    name: "Eric",
+    name: "Erik",
     portraits: {
       default: urls.ericPortraitSmirk,
       annoyed: urls.ericPortraitAnnoyed,

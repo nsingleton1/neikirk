@@ -11,7 +11,7 @@ import {
 
 /**
  * The yard story is split into chunks so Stardew-style "notice" prompts can
- * interrupt it: [yard chunk] -> "You notice Eric ..." [Y/N] -> Eric's
+ * interrupt it: [yard chunk] -> "You notice Erik ..." [Y/N] -> Eric's
  * conman excuse (portrait dialogue) -> next chunk. World state carries
  * across chunks by re-seeding: each chunk spawns Eric where the last one
  * left him and re-marks the tiles sprayed so far.
@@ -132,7 +132,7 @@ const yard4: TimelineAction[] = [
   { type: "wait", ms: 400 },
 ];
 
-/** "You notice Eric ..." interrupt prompt. Saying something is the default. */
+/** "You notice Erik ..." interrupt prompt. Saying something is the default. */
 function notice(id: string, text: string, excuseSceneId: string, nextChunkId: string): DialogueScene {
   return {
     id,
@@ -176,7 +176,7 @@ export const scenes: Record<string, Scene> = {
     speakerId: ERIC,
     expression: "default",
     backgroundUrl: urls.doorBg,
-    lines: ["Hello, my name is Eric.", "May I spray your weeds?"],
+    lines: ["Hello, my name is Erik.", "May I spray your weeds?"],
     choices: [
       { id: "yes", label: "YES, PLEASE", nextSceneId: "yard-1", isDefault: true },
       { id: "no", label: "ABSOLUTELY NOT", nextSceneId: "door-refused" },
@@ -189,15 +189,19 @@ export const scenes: Record<string, Scene> = {
     speakerId: ERIC,
     expression: "annoyed",
     backgroundUrl: urls.doorBg,
-    lines: ["...", "I'll take that as a yes."],
-    choices: [{ id: "sigh", label: "*sigh*", nextSceneId: "yard-1", isDefault: true }],
-    autoChooseAfterMs: 6000,
+    lines: [
+      "DON'T spray the weeds?! DON'T?!",
+      "Look at this lawn. It's a DISASTER.",
+      "I'm spraying the weeds ANYWAY.",
+    ],
+    choices: [{ id: "wait", label: "WAIT, NO—", nextSceneId: "yard-1", isDefault: true }],
+    autoChooseAfterMs: 4000,
   },
 
   "yard-1": scripted("yard-1", yard1, "notice-pee"),
   "notice-pee": notice(
     "notice-pee",
-    "You notice Eric peeing on your tree.",
+    "You notice Erik peeing on your tree.",
     "excuse-pee",
     "yard-2",
   ),
@@ -210,7 +214,7 @@ export const scenes: Record<string, Scene> = {
   "yard-2": scripted("yard-2", yard2, "notice-plant"),
   "notice-plant": notice(
     "notice-plant",
-    "You notice Eric planting NEW weeds in your lawn.",
+    "You notice Erik planting NEW weeds in your lawn.",
     "excuse-plant",
     "yard-3",
   ),
@@ -223,7 +227,7 @@ export const scenes: Record<string, Scene> = {
   "yard-3": scripted("yard-3", yard3, "notice-nap"),
   "notice-nap": notice(
     "notice-nap",
-    "You notice Eric napping in your flower bed.",
+    "You notice Erik napping in your flower bed.",
     "excuse-nap",
     "yard-4",
   ),
@@ -238,18 +242,18 @@ export const scenes: Record<string, Scene> = {
   bill: {
     id: "bill",
     type: "ending",
-    headline: "YOU OWE ERIC $10,000.",
+    headline: "YOU OWE ERIK $10,000.",
     subtext: "The weeds have been sprayed.",
     fakeChoices: [
       {
         id: "pay",
         label: "PAY NOW",
-        resultText: "Payment failed. You still owe Eric $10,000.",
+        resultText: "Payment failed. You still owe Erik $10,000.",
       },
       {
         id: "dispute",
         label: "DISPUTE CHARGE",
-        resultText: "Dispute denied. You now also owe Eric $10,000 in legal fees.",
+        resultText: "Dispute denied. You now also owe Erik $10,000 in legal fees.",
       },
     ],
     showRestart: true,
