@@ -114,6 +114,7 @@ interface CharStyle {
   jacketLight: RGBA;
   pants: RGBA;
   heavyset: boolean;
+  shades?: boolean;
 }
 
 const ERIC_STYLE: CharStyle = {
@@ -135,6 +136,17 @@ const SCHMIDT_STYLE: CharStyle = {
   jacketLight: C("#8f3d3d"),
   pants: C("#3d4a68"),
   heavyset: false,
+};
+
+const FANCY_STYLE: CharStyle = {
+  hat: null,
+  hair: C("#1a1a1e"), // slicked-back black
+  beard: null,
+  jacket: C("#26262e"), // sharp dark suit
+  jacketLight: C("#3a3a46"),
+  pants: C("#1e1e24"),
+  heavyset: false,
+  shades: true,
 };
 
 const NICK_STYLE: CharStyle = {
@@ -228,15 +240,19 @@ function drawChar(img: Img, ox: number, oy: number, s: CharStyle, pose: Pose) {
     // grin gap
     img.rect(hx + 3, headY + 5, 2, 1, WHITE);
   }
-  // eyes (looking down when on phone)
+  // eyes (looking down when on phone) — or sunglasses
   const eyeY = headY + (pose.startsWith("phone") || sitting ? 3.5 : 3);
-  if (pose.startsWith("argue")) {
-    // angry brows
-    img.px(hx + 2, eyeY - 1, BLACK);
-    img.px(hx + 5, eyeY - 1, BLACK);
+  if (s.shades) {
+    img.rect(hx + 1, eyeY, 6, 1.5, BLACK);
+  } else {
+    if (pose.startsWith("argue")) {
+      // angry brows
+      img.px(hx + 2, eyeY - 1, BLACK);
+      img.px(hx + 5, eyeY - 1, BLACK);
+    }
+    img.px(hx + 2, eyeY, BLACK);
+    img.px(hx + 5, eyeY, BLACK);
   }
-  img.px(hx + 2, eyeY, BLACK);
-  img.px(hx + 5, eyeY, BLACK);
 
   // --- body ---
   const bodyY = headY + 7;
@@ -450,6 +466,31 @@ function drawVan(img: Img, ox: number, frame: number) {
   img.rect(ox + 2, y + 14, 34, 1, VAN_RED_DARK);
   drawWheel(img, ox + 7, 18, frame);
   drawWheel(img, ox + 27, 18, frame);
+}
+
+function drawFancyCar(img: Img, ox: number, frame: number) {
+  const bounce = frame === 1 ? -1 : 0;
+  const y = 8 + bounce; // low and sleek
+  const GOLD = C("#d4af37");
+  const GOLD_DARK = C("#a8871e");
+  const GLEAM = C("#fff6d0");
+  // long low wedge body (faces right)
+  img.rect(ox + 2, y + 4, 34, 6, GOLD);
+  img.rect(ox + 34, y + 6, 4, 4, GOLD); // pointed nose
+  // sleek cabin
+  img.rect(ox + 10, y, 16, 4, GOLD);
+  img.rect(ox + 12, y + 1, 12, 3, TRIM_BLACK); // tinted glass
+  // rear spoiler
+  img.rect(ox + 2, y - 2, 2, 2, GOLD_DARK);
+  img.rect(ox + 1, y - 3, 4, 1, GOLD_DARK);
+  // gleam highlights
+  img.px(ox + 30, y + 4, GLEAM);
+  img.px(ox + 31, y + 4, GLEAM);
+  img.px(ox + 18, y, GLEAM);
+  img.px(ox + 37, y + 6, WHITE); // headlight
+  img.rect(ox + 2, y + 9, 36, 1, GOLD_DARK); // rocker shadow
+  drawWheel(img, ox + 6, 18, frame);
+  drawWheel(img, ox + 28, 18, frame);
 }
 
 function makeVehicleSheet(file: string, draw: (img: Img, ox: number, f: number) => void) {
@@ -741,8 +782,10 @@ fs.mkdirSync(OUT, { recursive: true });
 makeCharSheet("characters/eric.png", ERIC_STYLE);
 makeCharSheet("characters/schmidt.png", SCHMIDT_STYLE);
 makeCharSheet("characters/nick.png", NICK_STYLE);
+makeCharSheet("characters/fancy.png", FANCY_STYLE);
 makeVehicleSheet("vehicles/truck-yellow.png", drawTruck);
 makeVehicleSheet("vehicles/van-red.png", drawVan);
+makeVehicleSheet("vehicles/car-fancy.png", drawFancyCar);
 makeYardMap();
 makeSprayedOverlay();
 makeWeedyOverlay();

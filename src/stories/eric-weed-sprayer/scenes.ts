@@ -59,7 +59,8 @@ const yard1: TimelineAction[] = [
     driverId: "nick",
     parkX: 4,
     confrontAt: { x: 4, y: 7 },
-    argueMs: 1800,
+    argueMs: 2400,
+    bubbles: "#?!*",
   }),
   // wanders to the tree...
   { type: "moveTo", actorId: ERIC, to: { x: 7, y: 6 }, speed: 2.5 },
@@ -68,7 +69,8 @@ const yard1: TimelineAction[] = [
   { type: "anim", actorId: ERIC, name: "pee" },
 ];
 
-/** Chunk 2: back to "work", plants another, naps, then the mailbox. */
+/** Chunk 2: back to "work", plants one, naps, then the big two-at-once
+ * planting operation — caught in the act. */
 const yard2: TimelineAction[] = [
   ...carry(CHUNK1_TILES),
   ...carryWeeds(WEEDS_1),
@@ -77,19 +79,6 @@ const yard2: TimelineAction[] = [
   ...sprayTile({ x: 6, y: 5 }),
   ...plantWeeds([{ x: 5, y: 5 }]),
   ...nap(1700),
-  { type: "moveTo", actorId: ERIC, to: { x: 8.6, y: 12 }, speed: 2.8 },
-  { type: "face", actorId: ERIC, dir: "down" },
-  { type: "anim", actorId: ERIC, name: "phone", durationMs: 1000 }, // rummaging
-  { type: "anim", actorId: ERIC, name: "phone" },
-];
-
-/** Chunk 2b: the big planting operation — two at once, caught in the act. */
-const yard2b: TimelineAction[] = [
-  ...carry(CHUNK2_TILES),
-  ...carryWeeds(WEEDS_2),
-  { type: "spawn", actorId: ERIC, at: { x: 8.6, y: 12 }, facing: "down" },
-  { type: "checkpoint", id: "planting" },
-  { type: "moveTo", actorId: ERIC, to: { x: 5.5, y: 8 }, speed: 2.8 },
   ...plantWeeds([{ x: 5, y: 7 }, { x: 6, y: 7 }]),
   { type: "anim", actorId: ERIC, name: "plant" },
 ];
@@ -121,14 +110,14 @@ const yard4: TimelineAction[] = [
   ...carryWeeds(),
   ...POCK_TILES.map((tile): TimelineAction => ({ type: "setTile", tile, state: "pock" })),
   { type: "spawn", actorId: ERIC, at: { x: 3, y: 8 }, facing: "down" },
-  { type: "checkpoint", id: "van-2" },
+  { type: "checkpoint", id: "fancy-car" },
   ...vehicleConfrontation({
-    vehicleId: "van",
-    driverId: "nick",
+    vehicleId: "fancycar",
+    driverId: "fancy",
     parkX: 5,
     confrontAt: { x: 4, y: 9 },
     argueMs: 2200,
-    bubbles: "!!",
+    bubbles: "$#!*",
   }),
   ...sprayTile({ x: 6, y: 9 }),
   ...nap(2000, true),
@@ -218,20 +207,7 @@ export const scenes: Record<string, Scene> = {
     "yard-2",
   ),
 
-  "yard-2": scripted("yard-2", yard2, "notice-mail"),
-  "notice-mail": notice(
-    "notice-mail",
-    "You notice Eric going through your mail.",
-    "excuse-mail",
-    "yard-2b",
-  ),
-  "excuse-mail": excuse(
-    "excuse-mail",
-    ["Oh, NOW you have questions?!", "I am looking for COUPONS! For YOU! You're welcome!!"],
-    "yard-2b",
-  ),
-
-  "yard-2b": scripted("yard-2b", yard2b, "notice-plant"),
+  "yard-2": scripted("yard-2", yard2, "notice-plant"),
   "notice-plant": notice(
     "notice-plant",
     "You notice Eric planting NEW weeds in your lawn.",

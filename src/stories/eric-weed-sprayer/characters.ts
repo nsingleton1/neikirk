@@ -24,6 +24,10 @@ export const characters: Record<string, CharacterDef> = {
     name: "Nick",
     sprite: personSheet(urls.nickSheet),
   },
+  fancy: {
+    name: "Fancy Man",
+    sprite: personSheet(urls.fancySheet),
+  },
   truck: {
     name: "Yellow Truck",
     sprite: vehicleSheet(urls.truckSheet),
@@ -31,6 +35,10 @@ export const characters: Record<string, CharacterDef> = {
   van: {
     name: "Red Van",
     sprite: vehicleSheet(urls.vanSheet),
+  },
+  fancycar: {
+    name: "Fancy Car",
+    sprite: vehicleSheet(urls.fancyCarSheet),
   },
 };
 
