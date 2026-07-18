@@ -2,3 +2,8 @@ progress.md
 .venv/
 __pycache__/
 .env
+node_modules/
+dist/
+*.local
+tsconfig.tsbuildinfo
+*.local.mjs

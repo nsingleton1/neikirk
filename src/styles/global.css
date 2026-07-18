@@ -1,0 +1,110 @@
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --pixel-font: "Courier New", ui-monospace, monospace;
+  --ui-bg: #2a1f14;
+  --ui-border: #e8d5a0;
+  --ui-text: #f4ecd8;
+  --accent: #7ec850;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html,
+body {
+  height: 100%;
+  overscroll-behavior: none;
+  background: #14100c;
+}
+
+body {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  touch-action: manipulation;
+  font-family: var(--pixel-font);
+}
+
+#root {
+  position: fixed;
+  inset: 0;
+  height: 100vh;
+  height: -webkit-fill-available;
+  height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: 560px; /* keeps desktop from stretching absurdly wide */
+  overflow: hidden;
+  background: #14100c;
+  display: flex;
+  flex-direction: column;
+}
+
+canvas.pixel {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  display: block;
+}
+
+button.retro {
+  font-family: var(--pixel-font);
+  font-weight: bold;
+  font-size: 18px;
+  line-height: 1.2;
+  color: var(--ui-text);
+  background: var(--ui-bg);
+  border: 3px solid var(--ui-border);
+  border-radius: 4px;
+  box-shadow: 0 4px 0 #000;
+  padding: 14px 18px;
+  min-height: 52px;
+  min-width: 44px;
+  cursor: pointer;
+  text-align: center;
+}
+
+button.retro:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #000;
+}
+
+.overlay-full {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: #14100cee;
+  color: var(--ui-text);
+  text-align: center;
+  padding: 24px;
+  padding-top: calc(24px + var(--safe-top));
+  padding-bottom: calc(24px + var(--safe-bottom));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
