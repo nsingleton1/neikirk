@@ -211,6 +211,77 @@ export function vehicleConfrontation(o: VisitOpts): TimelineAction[] {
 }
 
 /**
+ * A guy pushing a grocery cart rattles along the sidewalk, stops, and gets
+ * into a fist-shaking argument with Eric (who marches down to meet him).
+ * Ends with Eric near the sidewalk at (stopX, 11.8).
+ */
+export function cartConfrontation(o: {
+  stopX: number;
+  argueMs: number;
+  bubbles: string;
+}): TimelineAction[] {
+  const CART = "cart";
+  const GUY = "cartguy";
+  return [
+    { type: "spawn", actorId: CART, at: { x: -1.2, y: SIDEWALK_Y }, facing: "right" },
+    { type: "spawn", actorId: GUY, at: { x: -2.1, y: SIDEWALK_Y }, facing: "right" },
+    {
+      type: "parallel",
+      tracks: [
+        [{ type: "moveTo", actorId: CART, to: { x: o.stopX + 0.9, y: SIDEWALK_Y }, speed: 2.2 }],
+        [{ type: "moveTo", actorId: GUY, to: { x: o.stopX, y: SIDEWALK_Y }, speed: 2.2 }],
+        [
+          // Eric spots him and marches down to the sidewalk
+          { type: "wait", ms: 700 },
+          { type: "moveTo", actorId: ERIC, to: { x: o.stopX, y: 11.8 }, speed: 2.8 },
+          { type: "face", actorId: ERIC, dir: "down" },
+        ],
+      ],
+    },
+    { type: "face", actorId: GUY, dir: "up" },
+    {
+      type: "parallel",
+      tracks: [
+        [
+          { type: "anim", actorId: GUY, name: "argue" },
+          { type: "shake", actorId: GUY, durationMs: o.argueMs },
+          { type: "stopAnim", actorId: GUY },
+        ],
+        [
+          { type: "wait", ms: 350 },
+          { type: "anim", actorId: ERIC, name: "argue" },
+          { type: "shake", actorId: ERIC, durationMs: o.argueMs - 350 },
+          { type: "stopAnim", actorId: ERIC },
+        ],
+        [
+          { type: "wait", ms: 500 },
+          { type: "speechBubble", actorId: GUY, symbols: o.bubbles, durationMs: 1300 },
+          { type: "wait", ms: 1400 },
+          {
+            type: "speechBubble",
+            actorId: ERIC,
+            symbols: o.bubbles.split("").reverse().join(""),
+            durationMs: 1000,
+          },
+        ],
+      ],
+    },
+    // he grabs the cart and rattles off, unbothered
+    { type: "face", actorId: GUY, dir: "right" },
+    {
+      type: "parallel",
+      tracks: [
+        [{ type: "moveTo", actorId: CART, to: { x: 12.5, y: SIDEWALK_Y }, speed: 2.6 }],
+        [{ type: "moveTo", actorId: GUY, to: { x: 11.6, y: SIDEWALK_Y }, speed: 2.6 }],
+        [{ type: "anim", actorId: ERIC, name: "argue", durationMs: 900 }],
+      ],
+    },
+    { type: "despawn", actorId: CART },
+    { type: "despawn", actorId: GUY },
+  ];
+}
+
+/**
  * Sneakily plant weeds: shifty look both ways, then hunch down and tuck a
  * fresh weed into each tile. Job security.
  */

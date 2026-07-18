@@ -2,6 +2,7 @@ import { DialogueScene, Scene, TimelineAction, Vec } from "../../engine/types";
 import { urls } from "./assets";
 import {
   ERIC,
+  cartConfrontation,
   nap,
   plantWeeds,
   sprayAll,
@@ -79,6 +80,8 @@ const yard2: TimelineAction[] = [
   ...sprayTile({ x: 6, y: 5 }),
   ...plantWeeds([{ x: 5, y: 5 }]),
   ...nap(1700),
+  { type: "checkpoint", id: "cart-guy" },
+  ...cartConfrontation({ stopX: 5, argueMs: 2200, bubbles: "?#!" }),
   ...plantWeeds([{ x: 5, y: 7 }, { x: 6, y: 7 }]),
   { type: "anim", actorId: ERIC, name: "plant" },
 ];
@@ -144,7 +147,7 @@ function notice(id: string, text: string, excuseSceneId: string, nextChunkId: st
       { id: "yes", label: "SAY SOMETHING", nextSceneId: excuseSceneId, isDefault: true },
       { id: "no", label: "LET IT SLIDE", nextSceneId: nextChunkId },
     ],
-    autoChooseAfterMs: 3400,
+    autoChooseAfterMs: 3000,
   };
 }
 
@@ -158,7 +161,7 @@ function excuse(id: string, lines: string[], nextChunkId: string): DialogueScene
     backgroundUrl: urls.doorBg,
     lines,
     choices: [{ id: "ok", label: "SORRY I ASKED", nextSceneId: nextChunkId, isDefault: true }],
-    autoChooseAfterMs: 3400,
+    autoChooseAfterMs: 3000,
   };
 }
 

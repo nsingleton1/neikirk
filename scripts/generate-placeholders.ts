@@ -149,6 +149,16 @@ const FANCY_STYLE: CharStyle = {
   shades: true,
 };
 
+const CART_GUY_STYLE: CharStyle = {
+  hat: null,
+  hair: C("#8a6a3a"), // shaggy
+  beard: C("#7a5a34"),
+  jacket: C("#b5651d"), // rumpled orange jacket
+  jacketLight: C("#c97a30"),
+  pants: C("#55504a"),
+  heavyset: false,
+};
+
 const NICK_STYLE: CharStyle = {
   hat: C("#3a5a8a"), // ball cap
   hatFold: C("#4a6a9a"),
@@ -493,6 +503,37 @@ function drawFancyCar(img: Img, ox: number, frame: number) {
   drawWheel(img, ox + 28, 18, frame);
 }
 
+function makeCartSheet() {
+  // Grocery cart: 2 frames of 24x20, side view facing right.
+  const CW = 24;
+  const img = new Img(CW * 2, 20);
+  const WIRE = C("#9aa0a8");
+  const WIRE_DARK = C("#6e747c");
+  for (let f = 0; f < 2; f++) {
+    const ox = f * CW;
+    const jig = f === 1 ? -1 : 0;
+    // basket: shallow trapezoid with wire lattice
+    img.rect(ox + 6, 4 + jig, 15, 8, WIRE_DARK);
+    img.rect(ox + 7, 5 + jig, 13, 6, C("#c8cdd4", 120));
+    for (let x = ox + 8; x < ox + 20; x += 3) img.rect(x, 5 + jig, 1, 6, WIRE);
+    img.rect(ox + 7, 8 + jig, 13, 1, WIRE);
+    // groceries poking out
+    img.px(ox + 10, 3 + jig, C("#d94a3a")); // something red
+    img.px(ox + 14, 2 + jig, C("#7ec850")); // something leafy
+    img.px(ox + 15, 3 + jig, C("#7ec850"));
+    // handle (left side, where the guy pushes)
+    img.rect(ox + 3, 2 + jig, 2, 2, WIRE_DARK);
+    img.rect(ox + 4, 3 + jig, 3, 6, WIRE_DARK);
+    // frame down to wheels
+    img.rect(ox + 7, 12 + jig, 2, 4, WIRE_DARK);
+    img.rect(ox + 18, 12 + jig, 2, 4, WIRE_DARK);
+    // little caster wheels (jiggle between frames)
+    img.rect(ox + 6 + f, 16, 3, 3, TIRE);
+    img.rect(ox + 17 - f, 16, 3, 3, TIRE);
+  }
+  img.save("vehicles/cart.png");
+}
+
 function makeVehicleSheet(file: string, draw: (img: Img, ox: number, f: number) => void) {
   const img = new Img(VW * 2, VH);
   draw(img, 0, 0);
@@ -783,6 +824,8 @@ makeCharSheet("characters/eric.png", ERIC_STYLE);
 makeCharSheet("characters/schmidt.png", SCHMIDT_STYLE);
 makeCharSheet("characters/nick.png", NICK_STYLE);
 makeCharSheet("characters/fancy.png", FANCY_STYLE);
+makeCharSheet("characters/cartguy.png", CART_GUY_STYLE);
+makeCartSheet();
 makeVehicleSheet("vehicles/truck-yellow.png", drawTruck);
 makeVehicleSheet("vehicles/van-red.png", drawVan);
 makeVehicleSheet("vehicles/car-fancy.png", drawFancyCar);

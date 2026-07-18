@@ -20,6 +20,8 @@ export const urls = {
   schmidtSheet: `${BASE}/characters/schmidt.png`,
   nickSheet: `${BASE}/characters/nick.png`,
   fancySheet: `${BASE}/characters/fancy.png`,
+  cartGuySheet: `${BASE}/characters/cartguy.png`,
+  cartSheet: `${BASE}/vehicles/cart.png`,
   truckSheet: `${BASE}/vehicles/truck-yellow.png`,
   vanSheet: `${BASE}/vehicles/van-red.png`,
   fancyCarSheet: `${BASE}/vehicles/car-fancy.png`,
@@ -46,6 +48,19 @@ export function personSheet(url: string): SpriteSheetDef {
       pee: { frames: [14, 15], fps: 3 },
       plant: { frames: [16, 17], fps: 2.5 },
       shoot: { frames: [18, 19], fps: 6 },
+    },
+  };
+}
+
+export function cartSheet(url: string): SpriteSheetDef {
+  return {
+    url,
+    frameW: 24,
+    frameH: 20,
+    animations: {
+      idle: { frames: [0], fps: 1 },
+      // "walk" so the wheels jiggle while the engine moves it
+      walk: { frames: [0, 1], fps: 6 },
     },
   };
 }

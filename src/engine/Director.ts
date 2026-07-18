@@ -9,7 +9,7 @@ const TYPEWRITER_CPS = 40;
 const DT_CLAMP_MS = 100;
 /** Non-final dialogue lines auto-advance this long after fully revealing,
  * so an idle player is never stuck before a choice's countdown can arm. */
-const LINE_AUTO_ADVANCE_MS = 2000;
+const LINE_AUTO_ADVANCE_MS = 1800;
 
 interface DialogueRuntime {
   scene: DialogueScene;

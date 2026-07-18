@@ -1,5 +1,5 @@
 import { CharacterDef, MapDef } from "../../engine/types";
-import { personSheet, urls, vehicleSheet } from "./assets";
+import { cartSheet, personSheet, urls, vehicleSheet } from "./assets";
 
 export const characters: Record<string, CharacterDef> = {
   eric: {
@@ -27,6 +27,14 @@ export const characters: Record<string, CharacterDef> = {
   fancy: {
     name: "Fancy Man",
     sprite: personSheet(urls.fancySheet),
+  },
+  cartguy: {
+    name: "Cart Guy",
+    sprite: personSheet(urls.cartGuySheet),
+  },
+  cart: {
+    name: "Grocery Cart",
+    sprite: cartSheet(urls.cartSheet),
   },
   truck: {
     name: "Yellow Truck",

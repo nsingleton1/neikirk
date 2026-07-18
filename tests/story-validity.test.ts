@@ -72,7 +72,7 @@ describe("story validity", () => {
       if (scene.type === "ending") break;
       if (scene.type === "dialogue") {
         total += (scene.lines.join("").length / 40) * 1000;
-        total += (scene.lines.length - 1) * 2000; // idle line auto-advance
+        total += (scene.lines.length - 1) * 1800; // idle line auto-advance
         total += scene.autoChooseAfterMs ?? 0;
         const def = scene.choices?.find((c) => c.isDefault) ?? scene.choices?.[0];
         const next = def?.nextSceneId ?? scene.nextSceneId;
