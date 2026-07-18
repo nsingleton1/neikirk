@@ -3,7 +3,6 @@ import { urls } from "./assets";
 import {
   ERIC,
   nap,
-  phoneCheck,
   plantWeeds,
   sprayAll,
   sprayTile,
@@ -26,18 +25,17 @@ const CHUNK1_TILES: Vec[] = [
 const CHUNK2_TILES: Vec[] = [...CHUNK1_TILES, { x: 6, y: 5 }];
 const CHUNK3_TILES: Vec[] = [...CHUNK2_TILES, { x: 3, y: 8 }];
 
-/** Tiles where Eric sneakily plants NEW weeds. They survive the final
- * time-skip spray — job security. */
-export const WEED_TILES: Vec[] = [
-  { x: 5, y: 7 },
-  { x: 6, y: 7 },
-];
+/** Tiles where Eric sneakily plants NEW weeds — it's the running gag, so he
+ * does it in every chunk. They all survive the final time-skip spray. */
+const WEEDS_1: Vec[] = [{ x: 3, y: 6 }];
+const WEEDS_2: Vec[] = [...WEEDS_1, { x: 5, y: 5 }];
+export const WEED_TILES: Vec[] = [...WEEDS_2, { x: 5, y: 7 }, { x: 6, y: 7 }];
 
 const carry = (tiles: Vec[]): TimelineAction[] =>
   tiles.map((tile) => ({ type: "setTile", tile, state: "sprayed" }));
 
-const carryWeeds = (): TimelineAction[] =>
-  WEED_TILES.map((tile) => ({ type: "setTile", tile, state: "weedy" }));
+const carryWeeds = (tiles: Vec[] = WEED_TILES): TimelineAction[] =>
+  tiles.map((tile) => ({ type: "setTile", tile, state: "weedy" }));
 
 /** Chunk 1: gets to work, first naps, van drive-by #1, then... the tree. */
 const yard1: TimelineAction[] = [
@@ -45,7 +43,7 @@ const yard1: TimelineAction[] = [
   { type: "showDialogue", speakerId: ERIC, text: "Alright. Time to get to work.", durationMs: 1800 },
   { type: "checkpoint", id: "work-started" },
   ...sprayTile({ x: 2, y: 5 }),
-  ...phoneCheck(1800),
+  ...plantWeeds(WEEDS_1),
   ...sprayTile({ x: 4, y: 6 }),
   ...nap(1700),
   { type: "checkpoint", id: "van-1" },
@@ -63,13 +61,14 @@ const yard1: TimelineAction[] = [
   { type: "anim", actorId: ERIC, name: "pee" },
 ];
 
-/** Chunk 2: back to "work", another nap, then the mailbox. */
+/** Chunk 2: back to "work", plants another, naps, then the mailbox. */
 const yard2: TimelineAction[] = [
   ...carry(CHUNK1_TILES),
+  ...carryWeeds(WEEDS_1),
   { type: "spawn", actorId: ERIC, at: { x: 7, y: 6 }, facing: "left" },
   { type: "checkpoint", id: "chunk-2" },
   ...sprayTile({ x: 6, y: 5 }),
-  ...phoneCheck(2600, "..."),
+  ...plantWeeds([{ x: 5, y: 5 }]),
   ...nap(1700),
   { type: "moveTo", actorId: ERIC, to: { x: 8.6, y: 12 }, speed: 2.8 },
   { type: "face", actorId: ERIC, dir: "down" },
@@ -77,14 +76,14 @@ const yard2: TimelineAction[] = [
   { type: "anim", actorId: ERIC, name: "phone" },
 ];
 
-/** Chunk 2b: serious phone time at the mailbox, then the sneaky planting. */
+/** Chunk 2b: the big planting operation — two at once, caught in the act. */
 const yard2b: TimelineAction[] = [
   ...carry(CHUNK2_TILES),
+  ...carryWeeds(WEEDS_2),
   { type: "spawn", actorId: ERIC, at: { x: 8.6, y: 12 }, facing: "down" },
   { type: "checkpoint", id: "planting" },
-  ...phoneCheck(2600, "..."),
   { type: "moveTo", actorId: ERIC, to: { x: 5.5, y: 8 }, speed: 2.8 },
-  ...plantWeeds(WEED_TILES),
+  ...plantWeeds([{ x: 5, y: 7 }, { x: 6, y: 7 }]),
   { type: "anim", actorId: ERIC, name: "plant" },
 ];
 

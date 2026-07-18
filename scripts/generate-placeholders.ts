@@ -199,8 +199,9 @@ function drawChar(img: Img, ox: number, oy: number, s: CharStyle, pose: Pose) {
   }
 
   const sitting = pose.startsWith("sit");
+  const crouch = pose.startsWith("plant") ? 3 : 0;
   const bob = pose === "idle1" || pose === "walk1" ? 1 : 0;
-  const headY = oy + (sitting ? 6 : 1) + bob;
+  const headY = oy + (sitting ? 6 : 1) + bob + crouch;
 
   // --- head (8 wide) ---
   const hx = ox + 4;
@@ -239,7 +240,7 @@ function drawChar(img: Img, ox: number, oy: number, s: CharStyle, pose: Pose) {
 
   // --- body ---
   const bodyY = headY + 7;
-  const bodyH = sitting ? 6 : 8;
+  const bodyH = sitting ? 6 : crouch ? 6 : 8;
   img.rect(bx, bodyY, bodyW, bodyH, s.jacket);
   img.rect(bx + 1, bodyY, bodyW - 2, 2, s.jacketLight);
   // zipper
@@ -253,10 +254,11 @@ function drawChar(img: Img, ox: number, oy: number, s: CharStyle, pose: Pose) {
     img.rect(bx + bodyW - 1, bodyY + bodyH + 1, 2, 2, BOOTS);
   } else {
     const stride = pose === "walk1" ? 1 : 0;
-    img.rect(bx + 1, bodyY + bodyH, 3, 5 - bob, s.pants);
-    img.rect(bx + bodyW - 4, bodyY + bodyH, 3, 5 - bob, s.pants);
-    img.rect(bx + 1 - stride, bodyY + bodyH + 5 - bob, 3, 2, BOOTS);
-    img.rect(bx + bodyW - 4 + stride, bodyY + bodyH + 5 - bob, 3, 2, BOOTS);
+    const legH = crouch ? 3 : 5 - bob;
+    img.rect(bx + 1, bodyY + bodyH, 3, legH, s.pants);
+    img.rect(bx + bodyW - 4, bodyY + bodyH, 3, legH, s.pants);
+    img.rect(bx + 1 - stride, bodyY + bodyH + legH, 3, 2, BOOTS);
+    img.rect(bx + bodyW - 4 + stride, bodyY + bodyH + legH, 3, 2, BOOTS);
   }
 
   // --- arms & props ---
@@ -316,29 +318,42 @@ function drawChar(img: Img, ox: number, oy: number, s: CharStyle, pose: Pose) {
     }
     case "plant0":
     case "plant1": {
-      // hunched over, hand to the ground, sneaking a weed in
-      img.rect(bx - 1, armY, 1, 4, s.jacket);
-      img.rect(bx + bodyW, armY + 2, 2, 4, s.jacket); // arm reaching down
-      img.rect(bx + bodyW + 1, armY + 6, 2, 4, SKIN);
-      if (pose === "plant1") {
-        // the freshly planted weed appears at his hand
+      // crouched, arm reaching to the ground, planting a visible seedling
+      img.rect(bx - 1, armY, 1, 3, s.jacket);
+      img.rect(bx + bodyW, armY + 1, 2, 4, s.jacket); // arm reaching down
+      img.rect(bx + bodyW + 1, armY + 5, 2, 3, SKIN); // hand at the dirt
+      // dirt mound
+      img.rect(bx + bodyW + 1, oy + FH - 2, 4, 1, C("#6b4a2f"));
+      if (pose === "plant0") {
+        // seedling held in hand on the way down
+        img.px(bx + bodyW + 2, armY + 3, WEED);
+        img.px(bx + bodyW + 3, armY + 4, WEED);
+      } else {
+        // the freshly planted weed, big and proud
         img.px(bx + bodyW + 2, oy + FH - 3, WEED);
-        img.px(bx + bodyW + 1, oy + FH - 2, WEED);
-        img.px(bx + bodyW + 3, oy + FH - 2, WEED);
-        img.px(bx + bodyW + 2, oy + FH - 4, WEED_FLOWER);
+        img.px(bx + bodyW + 1, oy + FH - 4, WEED);
+        img.px(bx + bodyW + 3, oy + FH - 4, WEED);
+        img.px(bx + bodyW + 2, oy + FH - 5, WEED);
+        img.px(bx + bodyW + 2, oy + FH - 6, WEED_FLOWER);
       }
       break;
     }
     case "shoot0":
     case "shoot1": {
-      // arm extended with a cartoon shotgun; frame 1 adds the muzzle flash
-      img.rect(bx + bodyW, armY + 1, 3, 2, s.jacket);
-      img.rect(bx + bodyW + 3, armY + 1, 4, 1, GUN_METAL);
-      img.px(bx + bodyW + 3, armY + 2, GUN_METAL);
+      // both arms up holding a long cartoon shotgun; frame 1 = big flash
+      img.rect(bx + bodyW, armY, 3, 2, s.jacket); // upper arm
+      img.rect(bx - 1, armY + 1, 2, 2, s.jacket); // support arm across
+      img.rect(bx + bodyW - 2, armY - 1, 2, 2, C("#6b4a2f")); // wood stock
+      img.rect(bx + bodyW, armY - 1, 7, 2, GUN_METAL); // long barrel
       if (pose === "shoot1") {
-        img.px(bx + bodyW + 7, armY, MUZZLE);
-        img.px(bx + bodyW + 8, armY + 1, WHITE);
+        // starburst muzzle flash
+        img.px(bx + bodyW + 7, armY - 3, MUZZLE);
+        img.rect(bx + bodyW + 7, armY - 2, 2, 1, MUZZLE);
+        img.rect(bx + bodyW + 7, armY - 1, 3, 2, WHITE);
+        img.rect(bx + bodyW + 7, armY + 1, 2, 1, MUZZLE);
         img.px(bx + bodyW + 7, armY + 2, MUZZLE);
+        img.px(bx + bodyW + 9, armY - 2, MUZZLE);
+        img.px(bx + bodyW + 9, armY + 1, MUZZLE);
       }
       break;
     }

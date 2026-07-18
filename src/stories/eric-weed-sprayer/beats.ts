@@ -126,7 +126,7 @@ export function vehicleConfrontation(o: VisitOpts): TimelineAction[] {
                 type: "speechBubble",
                 actorId: ERIC,
                 symbols: o.bubbles.split("").reverse().join(""),
-                durationMs: 1600,
+                durationMs: 1000,
               },
             ]
           : [],
@@ -150,22 +150,39 @@ export function vehicleConfrontation(o: VisitOpts): TimelineAction[] {
     { type: "face", actorId: o.driverId, dir: "up" },
     ...argue,
     ...(o.shots
+      ? ([
+          // sidestep so the barrel visibly points AT Eric, not past him
+          {
+            type: "moveTo",
+            actorId: o.driverId,
+            to: { x: o.confrontAt.x - 1.6, y: o.confrontAt.y - 1.4 },
+            speed: 4,
+          },
+          { type: "face", actorId: o.driverId, dir: "right" },
+        ] as TimelineAction[])
+      : []),
+    ...(o.shots
       ? Array.from({ length: o.shots }, (): TimelineAction[] => [
+          // beat of clear air so the argument bubbles are gone before the gun
+          { type: "wait", ms: 500 },
           {
             type: "parallel",
             tracks: [
               [
-                { type: "anim", actorId: o.driverId, name: "shoot", durationMs: 800 },
-                { type: "speechBubble", actorId: o.driverId, symbols: "BANG!", durationMs: 700 },
+                { type: "anim", actorId: o.driverId, name: "shoot", durationMs: 1100 },
               ],
               [
                 { type: "wait", ms: 250 },
-                // Eric hits the deck (the nap frames double as a dive)
-                { type: "anim", actorId: ERIC, name: "nap", durationMs: 900 },
+                { type: "speechBubble", actorId: o.driverId, symbols: "BANG!", durationMs: 900 },
+              ],
+              [
+                // Eric: startled "!", then hits the deck (dive = nap frames)
+                { type: "emote", actorId: ERIC, emote: "!", durationMs: 500 },
+                { type: "wait", ms: 350 },
+                { type: "anim", actorId: ERIC, name: "nap", durationMs: 1100 },
               ],
             ],
           },
-          { type: "wait", ms: 200 },
         ]).flat()
       : []),
     ...(o.shots
