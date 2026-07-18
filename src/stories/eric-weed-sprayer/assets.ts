@@ -9,27 +9,32 @@
  */
 import { SpriteSheetDef } from "../../engine/types";
 
+/** Bump when any PNG's layout/content changes — busts stale browser/CDN
+ * caches so new code never renders against an old sheet. */
+export const ASSET_VERSION = 7;
+
 const BASE = import.meta.env.BASE_URL + "assets";
+const V = `?v=${ASSET_VERSION}`;
 
 export const urls = {
-  ericPortraitSmirk: `${BASE}/portraits/eric-smirk.png`,
-  ericPortraitAnnoyed: `${BASE}/portraits/eric-annoyed.png`,
-  ericPortraitTired: `${BASE}/portraits/eric-tired.png`,
-  ericPortraitPhone: `${BASE}/portraits/eric-phone.png`,
-  ericSheet: `${BASE}/characters/eric.png`,
-  schmidtSheet: `${BASE}/characters/schmidt.png`,
-  nickSheet: `${BASE}/characters/nick.png`,
-  fancySheet: `${BASE}/characters/fancy.png`,
-  cartGuySheet: `${BASE}/characters/cartguy.png`,
-  cartSheet: `${BASE}/vehicles/cart.png`,
-  truckSheet: `${BASE}/vehicles/truck-yellow.png`,
-  vanSheet: `${BASE}/vehicles/van-red.png`,
-  fancyCarSheet: `${BASE}/vehicles/car-fancy.png`,
-  yardMap: `${BASE}/maps/yard.png`,
-  tileSprayed: `${BASE}/maps/tile-sprayed.png`,
-  tileWeeds: `${BASE}/maps/tile-weeds.png`,
-  tilePock: `${BASE}/maps/tile-pock.png`,
-  doorBg: `${BASE}/ui/door-bg.png`,
+  ericPortraitSmirk: `${BASE}/portraits/eric-smirk.png${V}`,
+  ericPortraitAnnoyed: `${BASE}/portraits/eric-annoyed.png${V}`,
+  ericPortraitTired: `${BASE}/portraits/eric-tired.png${V}`,
+  ericPortraitPhone: `${BASE}/portraits/eric-phone.png${V}`,
+  ericSheet: `${BASE}/characters/eric.png${V}`,
+  schmidtSheet: `${BASE}/characters/schmidt.png${V}`,
+  nickSheet: `${BASE}/characters/nick.png${V}`,
+  fancySheet: `${BASE}/characters/fancy.png${V}`,
+  cartGuySheet: `${BASE}/characters/cartguy.png${V}`,
+  cartSheet: `${BASE}/vehicles/cart.png${V}`,
+  truckSheet: `${BASE}/vehicles/truck-yellow.png${V}`,
+  vanSheet: `${BASE}/vehicles/van-red.png${V}`,
+  fancyCarSheet: `${BASE}/vehicles/car-fancy.png${V}`,
+  yardMap: `${BASE}/maps/yard.png${V}`,
+  tileSprayed: `${BASE}/maps/tile-sprayed.png${V}`,
+  tileWeeds: `${BASE}/maps/tile-weeds.png${V}`,
+  tilePock: `${BASE}/maps/tile-pock.png${V}`,
+  doorBg: `${BASE}/ui/door-bg.png${V}`,
 };
 
 export function personSheet(url: string): SpriteSheetDef {

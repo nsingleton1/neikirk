@@ -4,7 +4,9 @@ import { scenes } from "./scenes";
 
 export const ericWeedSprayerStory: StoryConfig = {
   id: "eric-weed-sprayer",
-  version: 1,
+  // Bump on any scene-graph/checkpoint change: invalidates saved progress
+  // from older layouts so resume can't jump into a rearranged story.
+  version: 2,
   title: "Erik Weed Sprayer",
   startSceneId: "door",
   characters,

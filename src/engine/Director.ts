@@ -235,17 +235,30 @@ export class Director {
     }
   }
 
-  /** Fast-forward the fresh runner until the named checkpoint fires. */
+  /** Fast-forward the fresh runner until the named checkpoint fires. If the
+   * checkpoint no longer exists (stale save), restart the scene cleanly
+   * instead of leaving a fully fast-forwarded runner that would skip it. */
   private seekTo(checkpointId: string): void {
-    const runner = this.runner!;
+    const scene = this.currentScene();
+    if (scene.type !== "scripted") return;
     let reached = false;
-    const prevHandler = this.lastCheckpointId;
-    void prevHandler;
-    // Temporarily watch checkpoints via lastCheckpointId updates.
     let guard = 20000;
-    while (!reached && !runner.done && guard-- > 0) {
-      runner.advance(50);
+    while (!reached && !this.runner!.done && guard-- > 0) {
+      this.runner!.advance(50);
       if (this.lastCheckpointId === checkpointId) reached = true;
+    }
+    if (!reached) {
+      this.runner = new TimelineRunner(scene.timeline, {
+        onCheckpoint: (id) => {
+          this.lastCheckpointId = id;
+          saveCheckpoint({
+            storyId: this.story.id,
+            version: this.story.version,
+            sceneId: this.sceneId,
+            checkpointId: id,
+          });
+        },
+      });
     }
   }
 
