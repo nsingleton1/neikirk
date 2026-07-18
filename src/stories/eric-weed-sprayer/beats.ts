@@ -85,8 +85,10 @@ export interface VisitOpts {
   /** ms both parties spend arguing. */
   argueMs: number;
   bubbles?: string;
-  /** Cartoon warning shots fired mid-argument (Eric hits the deck each time). */
-  shots?: number;
+  /** After the argument, the driver gets back in and fires cartoon shots
+   * FROM the vehicle window. Every shot misses; each leaves a bullet pock
+   * in the lawn near Eric while he hits the deck. */
+  driveByShots?: { missTiles: Vec[] };
 }
 
 /**
@@ -149,56 +151,61 @@ export function vehicleConfrontation(o: VisitOpts): TimelineAction[] {
     { type: "moveTo", actorId: o.driverId, to: o.confrontAt, speed: 3.5 },
     { type: "face", actorId: o.driverId, dir: "up" },
     ...argue,
-    ...(o.shots
-      ? ([
-          // sidestep so the barrel visibly points AT Eric, not past him
-          {
-            type: "moveTo",
-            actorId: o.driverId,
-            to: { x: o.confrontAt.x - 1.6, y: o.confrontAt.y - 1.4 },
-            speed: 4,
-          },
-          { type: "face", actorId: o.driverId, dir: "right" },
-        ] as TimelineAction[])
-      : []),
-    ...(o.shots
-      ? Array.from({ length: o.shots }, (): TimelineAction[] => [
-          // beat of clear air so the argument bubbles are gone before the gun
-          { type: "wait", ms: 500 },
-          {
-            type: "parallel",
-            tracks: [
-              [
-                { type: "anim", actorId: o.driverId, name: "shoot", durationMs: 1100 },
-              ],
-              [
-                { type: "wait", ms: 250 },
-                { type: "speechBubble", actorId: o.driverId, symbols: "BANG!", durationMs: 900 },
-              ],
-              [
-                // Eric: startled "!", then hits the deck (dive = nap frames)
-                { type: "emote", actorId: ERIC, emote: "!", durationMs: 500 },
-                { type: "wait", ms: 350 },
-                { type: "anim", actorId: ERIC, name: "nap", durationMs: 1100 },
-              ],
-            ],
-          },
-        ]).flat()
-      : []),
-    ...(o.shots
-      ? [
-          // both pop back up for one last round of fist-shaking
-          { type: "anim", actorId: ERIC, name: "argue" } as TimelineAction,
-          { type: "shake", actorId: ERIC, durationMs: 800 } as TimelineAction,
-          { type: "stopAnim", actorId: ERIC } as TimelineAction,
-        ]
-      : []),
-    // driver stomps back, vehicle leaves
+    // driver stomps back and gets in
     { type: "moveTo", actorId: o.driverId, to: { x: o.parkX, y: SIDEWALK_Y }, speed: 3.5 },
     { type: "despawn", actorId: o.driverId },
+    ...(o.driveByShots
+      ? ([
+          // ...then leans back OUT the window with the shotgun. Spawned just
+          // above the vehicle so the truck body overlaps his legs — reads as
+          // shooting from inside the cab.
+          { type: "wait", ms: 400 },
+          {
+            type: "spawn",
+            actorId: o.driverId,
+            at: { x: o.parkX + 0.5, y: ROAD_Y - 0.6 },
+            facing: "right",
+          },
+          ...o.driveByShots.missTiles.flatMap((missTile): TimelineAction[] => [
+            {
+              type: "parallel",
+              tracks: [
+                [{ type: "anim", actorId: o.driverId, name: "shoot", durationMs: 1100 }],
+                [
+                  { type: "wait", ms: 250 },
+                  { type: "speechBubble", actorId: o.driverId, symbols: "BANG!", durationMs: 900 },
+                ],
+                [
+                  // Eric: startled "!", then hits the deck
+                  { type: "emote", actorId: ERIC, emote: "!", durationMs: 500 },
+                  { type: "wait", ms: 350 },
+                  { type: "anim", actorId: ERIC, name: "nap", durationMs: 1100 },
+                ],
+                [
+                  // the miss lands in the lawn beside him
+                  { type: "wait", ms: 550 },
+                  { type: "setTile", tile: missTile, state: "pock" },
+                ],
+              ],
+            },
+            { type: "wait", ms: 250 },
+          ]),
+          { type: "despawn", actorId: o.driverId },
+        ] as TimelineAction[])
+      : []),
+    // vehicle leaves
     { type: "anim", actorId: o.vehicleId, name: "drive" },
     { type: "moveTo", actorId: o.vehicleId, to: { x: 12, y: ROAD_Y }, speed: 8 },
     { type: "despawn", actorId: o.vehicleId },
+    ...(o.driveByShots
+      ? ([
+          // Eric gets up and shakes his fist at the departing truck
+          { type: "anim", actorId: ERIC, name: "argue" },
+          { type: "shake", actorId: ERIC, durationMs: 800 },
+          { type: "speechBubble", actorId: ERIC, symbols: "!!", durationMs: 900 },
+          { type: "stopAnim", actorId: ERIC },
+        ] as TimelineAction[])
+      : []),
   ];
 }
 

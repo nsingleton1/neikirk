@@ -47,6 +47,7 @@ export const maps: Record<string, MapDef> = {
     tileOverlays: {
       sprayed: urls.tileSprayed,
       weedy: urls.tileWeeds,
+      pock: urls.tilePock,
     },
   },
 };

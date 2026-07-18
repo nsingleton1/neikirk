@@ -31,6 +31,13 @@ const WEEDS_1: Vec[] = [{ x: 3, y: 6 }];
 const WEEDS_2: Vec[] = [...WEEDS_1, { x: 5, y: 5 }];
 export const WEED_TILES: Vec[] = [...WEEDS_2, { x: 5, y: 7 }, { x: 6, y: 7 }];
 
+/** Where Schmidt's drive-by shots land — clear MISSES beside Eric. The pocks
+ * stay in the lawn until the final time-skip "fixes" everything but the weeds. */
+const POCK_TILES: Vec[] = [
+  { x: 7, y: 6 },
+  { x: 5, y: 6 },
+];
+
 const carry = (tiles: Vec[]): TimelineAction[] =>
   tiles.map((tile) => ({ type: "setTile", tile, state: "sprayed" }));
 
@@ -100,7 +107,7 @@ const yard3: TimelineAction[] = [
     confrontAt: { x: 6, y: 8.6 },
     argueMs: 2400,
     bubbles: "#?!*",
-    shots: 2,
+    driveByShots: { missTiles: POCK_TILES },
   }),
   { type: "showDialogue", speakerId: ERIC, text: "Some people, huh.", durationMs: 1200 },
   ...sprayTile({ x: 3, y: 8 }),
@@ -112,6 +119,7 @@ const yard3: TimelineAction[] = [
 const yard4: TimelineAction[] = [
   ...carry(CHUNK3_TILES),
   ...carryWeeds(),
+  ...POCK_TILES.map((tile): TimelineAction => ({ type: "setTile", tile, state: "pock" })),
   { type: "spawn", actorId: ERIC, at: { x: 3, y: 8 }, facing: "down" },
   { type: "checkpoint", id: "van-2" },
   ...vehicleConfrontation({
@@ -150,21 +158,16 @@ function notice(id: string, text: string, excuseSceneId: string, nextChunkId: st
   };
 }
 
-/** Eric's portrait-dialogue con. He lies his way out of everything. */
-function excuse(
-  id: string,
-  expression: string,
-  lines: string[],
-  nextChunkId: string,
-): DialogueScene {
+/** Eric YELLS at you for daring to ask. Always the angry portrait. */
+function excuse(id: string, lines: string[], nextChunkId: string): DialogueScene {
   return {
     id,
     type: "dialogue",
     speakerId: ERIC,
-    expression,
+    expression: "annoyed",
     backgroundUrl: urls.doorBg,
     lines,
-    choices: [{ id: "ok", label: "...OKAY?", nextSceneId: nextChunkId, isDefault: true }],
+    choices: [{ id: "ok", label: "SORRY I ASKED", nextSceneId: nextChunkId, isDefault: true }],
     autoChooseAfterMs: 3400,
   };
 }
@@ -211,8 +214,7 @@ export const scenes: Record<string, Scene> = {
   ),
   "excuse-pee": excuse(
     "excuse-pee",
-    "default",
-    ["Whoa, whoa. This is a nitrogen-rich pre-treatment.", "Very expensive. You're welcome."],
+    ["EXCUSE ME?! That is a nitrogen-rich PRE-TREATMENT!", "I cannot BELIEVE you would even ask me that!"],
     "yard-2",
   ),
 
@@ -225,8 +227,7 @@ export const scenes: Record<string, Scene> = {
   ),
   "excuse-mail": excuse(
     "excuse-mail",
-    "annoyed",
-    ["Relax. I'm checking for coupons.", "For YOU. Weed control is a team effort."],
+    ["Oh, NOW you have questions?!", "I am looking for COUPONS! For YOU! You're welcome!!"],
     "yard-2b",
   ),
 
@@ -239,8 +240,7 @@ export const scenes: Record<string, Scene> = {
   ),
   "excuse-plant": excuse(
     "excuse-plant",
-    "default",
-    ["Those are decoy weeds. They lure out the real weeds.", "This is advanced lawn science. Trust the process."],
+    ["THOSE ARE DECOY WEEDS!! They lure out the REAL weeds!", "This is ADVANCED LAWN SCIENCE and you are RUINING it!"],
     "yard-3",
   ),
 
@@ -253,8 +253,7 @@ export const scenes: Record<string, Scene> = {
   ),
   "excuse-nap": excuse(
     "excuse-nap",
-    "tired",
-    ["I was NOT sleeping. I was listening to the lawn.", "The weeds fear a rested man."],
+    ["I was NOT SLEEPING! I was LISTENING to the LAWN!", "The AUDACITY. The weeds FEAR a rested man!!"],
     "yard-4",
   ),
 

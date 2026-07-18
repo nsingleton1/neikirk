@@ -24,6 +24,7 @@ export const urls = {
   yardMap: `${BASE}/maps/yard.png`,
   tileSprayed: `${BASE}/maps/tile-sprayed.png`,
   tileWeeds: `${BASE}/maps/tile-weeds.png`,
+  tilePock: `${BASE}/maps/tile-pock.png`,
   doorBg: `${BASE}/ui/door-bg.png`,
 };
 

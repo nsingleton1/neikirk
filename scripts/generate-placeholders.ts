@@ -558,6 +558,25 @@ function makeWeedyOverlay() {
   img.save("maps/tile-weeds.png");
 }
 
+function makePockOverlay() {
+  // Bullet pocks in the lawn — clear MISSES near Eric.
+  const img = new Img(16, 16);
+  const DIRT = C("#5a4028");
+  const DIRT_DARK = C("#3f2c1a");
+  const SMOKE = C("#b9b3a8", 220);
+  for (const [cx, cy] of [
+    [5, 6],
+    [11, 10],
+  ] as const) {
+    img.rect(cx - 1, cy - 1, 3, 3, DIRT);
+    img.px(cx, cy, DIRT_DARK);
+    img.px(cx + 1, cy - 2, SMOKE);
+    img.px(cx - 2, cy - 2, SMOKE);
+    img.px(cx, cy - 3, SMOKE);
+  }
+  img.save("maps/tile-pock.png");
+}
+
 function makeSprayedOverlay() {
   const img = new Img(16, 16);
   for (let y = 1; y < 16; y++)
@@ -636,7 +655,11 @@ function makePortrait(expr: Expression) {
     img.rect(38, 34 + tilt, 3, 3, WHITE);
     img.px(41, 33 + tilt, BEARD);
   } else if (expr === "annoyed") {
-    img.rect(26, 36 + tilt, 12, 2, C("#8a5a4a"));
+    // yelling: wide open mouth with gritted teeth
+    img.rect(24, 34 + tilt, 16, 6, C("#5a2a22"));
+    img.rect(25, 35 + tilt, 14, 2, WHITE);
+    for (let tx = 27; tx < 39; tx += 3) img.px(tx, 35 + tilt, C("#c9beac"));
+    img.rect(25, 38 + tilt, 14, 1, WHITE);
   } else if (expr === "tired") {
     img.rect(27, 36 + tilt, 10, 2, C("#8a5a4a"));
     img.rect(29, 38 + tilt, 6, 2, C("#5a3a30")); // yawn
@@ -662,10 +685,14 @@ function makePortrait(expr: Expression) {
 
   // brows
   if (expr === "annoyed") {
-    img.rect(20, eyeY - 4, 7, 2, BEARD);
-    img.rect(37, eyeY - 4, 7, 2, BEARD);
-    img.px(26, eyeY - 3, BEARD);
-    img.px(37, eyeY - 3, BEARD);
+    // steep angry brows + a couple of cartoon rage ticks at the temple
+    img.rect(20, eyeY - 5, 7, 2, BEARD);
+    img.rect(37, eyeY - 5, 7, 2, BEARD);
+    img.rect(25, eyeY - 4, 2, 2, BEARD);
+    img.rect(37, eyeY - 4, 2, 2, BEARD);
+    img.px(50, eyeY - 8, C("#c03a2e"));
+    img.px(52, eyeY - 6, C("#c03a2e"));
+    img.px(50, eyeY - 4, C("#c03a2e"));
   } else if (expr === "smirk") {
     img.rect(20, eyeY - 5, 7, 2, BEARD);
     img.rect(37, eyeY - 6, 7, 2, BEARD); // one raised
@@ -719,6 +746,7 @@ makeVehicleSheet("vehicles/van-red.png", drawVan);
 makeYardMap();
 makeSprayedOverlay();
 makeWeedyOverlay();
+makePockOverlay();
 for (const e of ["smirk", "annoyed", "tired", "phone"] as Expression[]) makePortrait(e);
 makeDoorBackground();
 console.log("done");
