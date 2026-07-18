@@ -11,7 +11,7 @@ export const ERIC = "eric";
 /** Walk to a lawn tile and spray it. */
 export function sprayTile(tile: Vec): TimelineAction[] {
   return [
-    { type: "moveTo", actorId: ERIC, to: tile, speed: 2.5 },
+    { type: "moveTo", actorId: ERIC, to: tile, speed: 3 },
     { type: "face", actorId: ERIC, dir: "down" },
     { type: "anim", actorId: ERIC, name: "spray", durationMs: 1400 },
     { type: "setTile", tile, state: "sprayed" },

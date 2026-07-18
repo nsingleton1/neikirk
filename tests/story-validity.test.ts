@@ -94,11 +94,9 @@ describe("story validity", () => {
 
     expect(story.scenes[sceneId].type, `path: ${visited.join(" -> ")}`).toBe("ending");
     // Ceiling is the ZERO-TAP worst case (every countdown runs out). A real
-    // player tapping through dialogue lands well under two minutes. Raised
-    // from 120s on 2026-07-18 when Nick added the planting + shooting gags
-    // and the fourth notice interrupt.
+    // player tapping through dialogue lands well under this.
     expect(total, `total runtime ${Math.round(total / 1000)}s`).toBeGreaterThanOrEqual(60000);
-    expect(total, `total runtime ${Math.round(total / 1000)}s`).toBeLessThanOrEqual(140000);
+    expect(total, `total runtime ${Math.round(total / 1000)}s`).toBeLessThanOrEqual(120000);
 
     // The final chunk leaves every lawn tile sprayed — except Eric's
     // sneakily planted weeds, which survive — and the road empty.
