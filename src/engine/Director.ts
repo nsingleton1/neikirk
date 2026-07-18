@@ -48,10 +48,9 @@ export class Director {
 
   async start(): Promise<void> {
     try {
-      setUI({ phase: "loading", loadProgress: 0 });
-      await this.assets.loadAll(this.criticalAssetUrls(), (f) =>
-        setUI({ loadProgress: f }),
-      );
+      // Never block the first scene on images: dialogue text renders
+      // immediately and the portrait pops in when its PNG arrives.
+      this.assets.preload(this.criticalAssetUrls());
       this.assets.preload(this.allAssetUrls());
       this.installListeners();
       const save = loadCheckpoint(this.story.id, this.story.version);
